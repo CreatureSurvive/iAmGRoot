@@ -1,0 +1,27 @@
+TARGET = iphone:clang:11.2:10.0
+ARCHS = armv7 armv7s arm64
+
+DEBUG = 1
+GO_EASY_ON_ME = 0
+BUILD_EXT = i
+
+ifeq ($(DEBUG), 1)
+	BUILDNUMBER = -$(VERSION.INC_BUILD_NUMBER)
+	FINALPACKAGE = 0
+else
+	BUILDNUMBER = 
+	FINALPACKAGE = 1
+endif
+
+PACKAGE_VERSION = $(THEOS_PACKAGE_BASE_VERSION)$(BUILDNUMBER)$(BUILD_EXT)
+
+include $(THEOS)/makefiles/common.mk
+
+FRAMEWORK_NAME = iAmGRoot
+$(FRAMEWORK_NAME)_LINKAGE_TYPE = static
+$(FRAMEWORK_NAME)_FILES = $(wildcard source/*.m)
+$(FRAMEWORK_NAME)_PUBLIC_HEADERS = source/Privileged.h
+$(FRAMEWORK_NAME)_INSTALL_PATH = /Library/Frameworks
+$(FRAMEWORK_NAME)_CFLAGS += -fobjc-arc -I$(THEOS_PROJECT_DIR)/source
+
+include $(THEOS_MAKE_PATH)/framework.mk

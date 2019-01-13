@@ -1,0 +1,10 @@
+Package: com.creaturecoding.iamgroot
+Name: iAmGRoot
+Depends: 
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: gain root exec for obj-c code blocks
+Maintainer: CreatureSurvive <support@creaturecoding.com>
+Author: CreatureSurvive <support@creaturecoding.com>
+Section: System
+Tag: role::developer
