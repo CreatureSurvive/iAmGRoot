@@ -10,6 +10,7 @@
 		B883EEF2221223190002C4AE /* iAmGRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = B883EEF0221223190002C4AE /* iAmGRoot.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B883EF02221224050002C4AE /* Authorized.h in Headers */ = {isa = PBXBuildFile; fileRef = B883EF00221224050002C4AE /* Authorized.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B883EF03221224050002C4AE /* Authorized.m in Sources */ = {isa = PBXBuildFile; fileRef = B883EF01221224050002C4AE /* Authorized.m */; };
+		B8BDFD98226428AD00C87B0F /* COPYRIGHT.md in Resources */ = {isa = PBXBuildFile; fileRef = B8BDFD972264269D00C87B0F /* COPYRIGHT.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,6 +19,7 @@
 		B883EEF1221223190002C4AE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B883EF00221224050002C4AE /* Authorized.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Authorized.h; sourceTree = "<group>"; };
 		B883EF01221224050002C4AE /* Authorized.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Authorized.m; sourceTree = "<group>"; };
+		B8BDFD972264269D00C87B0F /* COPYRIGHT.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = COPYRIGHT.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +56,7 @@
 				B883EEF1221223190002C4AE /* Info.plist */,
 				B883EF00221224050002C4AE /* Authorized.h */,
 				B883EF01221224050002C4AE /* Authorized.m */,
+				B8BDFD972264269D00C87B0F /* COPYRIGHT.md */,
 			);
 			path = iAmGRoot;
 			sourceTree = "<group>";
@@ -127,6 +130,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8BDFD98226428AD00C87B0F /* COPYRIGHT.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -199,7 +203,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -255,6 +259,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -265,6 +270,11 @@
 		B883EEF6221223190002C4AE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					"$(ARCHS_STANDARD)",
+					arm64e,
+					armv7s,
+				);
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -292,6 +302,11 @@
 		B883EEF7221223190002C4AE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					"$(ARCHS_STANDARD)",
+					arm64e,
+					armv7s,
+				);
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;

@@ -18,15 +18,33 @@
 @end
 
 void authorize_as(int user, int group) {
+	
+	setruid(user);
+	setruid(user);
+	setrgid(group);
+	
+	
+	if (getuid() == user && getgid() == group) { return; }
+	NSLog(@"(*** iAmGRoot ***) PHASE 1 failed uid not set, attempting PHASE 2");
+	
+	if (getuid() != user) { seteuid(user); }
+	if (getgid() != group) { setegid(group); }
+	
+	if (getuid() == user && getgid() == group) { return; }
+	NSLog(@"(*** iAmGRoot ***) PHASE 2 failed uid not set, attempting PHASE 3");
+	
+	setuid(user);
 	setuid(user);
 	setgid(group);
 	
-	if (getuid() == user) { return; }
+	if (getuid() == user && getgid() == group) { return; }
+	NSLog(@"(*** iAmGRoot ***) PHASE 3 failed uid not set, attempting PHASE 4");
 	
 	void* handle = dlopen("/usr/lib/libjailbreak.dylib", RTLD_LAZY);
 	
 	if (!handle) {
-		printf("Err: %s \nunable to find libjailbreak.dylib\n", dlerror());
+		NSLog(@"(*** iAmGRoot ***) ERROR %s unable to find libjailbreak.dylib", dlerror());
+		NSLog(@"(*** iAmGRoot ***) ERROR failed setrid, seteid, setuid");
 		return;
 	}
 	
@@ -37,16 +55,21 @@ void authorize_as(int user, int group) {
 	
 	setuidptr(getpid());
 	setuid(user);
+	setuid(user);
 	
 	const char *dlsym_error = dlerror();
 	if (dlsym_error) {
-		printf("encountered dlsym error: %s \n", dlsym_error);
+		NSLog(@"(*** iAmGRoot ***) ERROR unable to platformize (dlsym error): %s \n", dlsym_error);
 		return;
 	}
 	
 	entitleptr(getpid(), FLAG_PLATFORMIZE);
 	
 	if (getuid() != user) { setuid(user); }
+	if (getgid() != group) { setgid(group); }
+	
+	if (getuid() == user && getgid() == group) { return; }
+	NSLog(@"(*** iAmGRoot ***) PHASE 4 failed uid not set, dont blame me, blame the half baked jailbreak");
 }
 
 @implementation Authorized
@@ -79,27 +102,37 @@ void authorize_as(int user, int group) {
 	NSNumber *current_user	= [NSNumber numberWithInt:getuid()];
 	NSNumber *current_group	= [NSNumber numberWithInt:getgid()];
 	
-	if (current_user.intValue == user && current_group.intValue == group) return;
+	if (current_user.intValue == user && current_group.intValue == group) {
+		NSLog(@"(*** iAmGRoot ***) already running as efective user: (%d) and group: (%d), skipping elevation", current_user.intValue, current_group.intValue);
+		return;
+	}
 	
 	authorize_as(user, group);
 
-	[NSUserDefaults.standardUserDefaults setObject:current_user forKey:@"user"];
-	[NSUserDefaults.standardUserDefaults setObject:current_group forKey:@"group"];
+	[NSUserDefaults.standardUserDefaults setObject:current_user forKey:@"iagr_user"];
+	[NSUserDefaults.standardUserDefaults setObject:current_group forKey:@"iagr_group"];
 }
 
 + (void)restore {
 	
-	NSNumber *user = [NSUserDefaults.standardUserDefaults valueForKey:@"user"];
-	NSNumber *group = [NSUserDefaults.standardUserDefaults valueForKey:@"group"];
+	NSNumber *user = [NSUserDefaults.standardUserDefaults valueForKey:@"iagr_user"];
+	NSNumber *group = [NSUserDefaults.standardUserDefaults valueForKey:@"iagr_group"];
 	
-	NSAssert(user != nil || group != nil, @"iAmGRoot ERROR: you need to authorize before you can restore");
+//	NSAssert(user != nil || group != nil, @"iAmGRoot ERROR: you need to authorize before you can restore");
+	if (user == nil || group == nil) {
+		NSLog(@"(*** iAmGRoot ***) WARNING: you need to authorize before you can restore. skipping restore");
+		return;
+	}
 	
-	if (user.intValue == getuid() && group.intValue == getgid()) return;
+	if (user.intValue == getuid() && group.intValue == getgid()) {
+		NSLog(@"(*** iAmGRoot ***) WARNING: current user and group are the same as the restoration user and group, skipping restore for user: (%d) group: (%d)", user.intValue, group.intValue);
+		return;
+	}
 	
 	authorize_as(user.intValue, group.intValue);
 	
-	[NSUserDefaults.standardUserDefaults removeObjectForKey:@"user"];
-	[NSUserDefaults.standardUserDefaults removeObjectForKey:@"group"];
+	[NSUserDefaults.standardUserDefaults removeObjectForKey:@"iagr_user"];
+	[NSUserDefaults.standardUserDefaults removeObjectForKey:@"iagr_group"];
 }
 
 @end
