@@ -13,9 +13,8 @@
 
 #define FLAG_PLATFORMIZE (1 << 1)
 
-@interface NSUserDefaults (Private)
-- (void)setObject:(id)object forKey:(NSString *)key inDomain:(NSString *)domain;
-@end
+#define MOBILE 501
+#define ROOT 0
 
 void authorize_as(int user, int group) {
 	
@@ -74,6 +73,26 @@ void authorize_as(int user, int group) {
 
 @implementation Authorized
 
+static bool _lock;
+static NSNumber *_user;
+static NSNumber *_group;
+
++ (NSNumber *)user {
+    return _user;
+}
+
++ (NSNumber *)group {
+    return _group;
+}
+
++ (bool)isLocked {
+    return _lock;
+}
+
++ (void)setLocked:(bool)locked {
+    _lock = locked;
+}
+
 + (void)authorizedBlock:(void (^)(void (^_Nonnull)(void)))block {
 	int user	= getuid();
 	int group	= getgid();
@@ -94,10 +113,16 @@ void authorize_as(int user, int group) {
 }
 
 + (void)authorizeAsRoot {
-	[Authorized authorizeAsUser:0 group:0];
+	[Authorized authorizeAsUser:ROOT group:ROOT];
+}
+
++ (void)authorizeAsMobile {
+    [Authorized authorizeAsUser:MOBILE group:MOBILE];
 }
 
 + (void)authorizeAsUser:(int)user group:(int)group {
+    
+    if (_lock) return;
 	
 	NSNumber *current_user	= [NSNumber numberWithInt:getuid()];
 	NSNumber *current_group	= [NSNumber numberWithInt:getgid()];
@@ -109,14 +134,14 @@ void authorize_as(int user, int group) {
 	
 	authorize_as(user, group);
 
-	[NSUserDefaults.standardUserDefaults setObject:current_user forKey:@"iagr_user"];
-	[NSUserDefaults.standardUserDefaults setObject:current_group forKey:@"iagr_group"];
+    _user = current_user;
+    _group = current_group;
 }
 
 + (void)restore {
 	
-	NSNumber *user = [NSUserDefaults.standardUserDefaults valueForKey:@"iagr_user"];
-	NSNumber *group = [NSUserDefaults.standardUserDefaults valueForKey:@"iagr_group"];
+    NSNumber *user = _user;
+    NSNumber *group = _group;
 	
 //	NSAssert(user != nil || group != nil, @"iAmGRoot ERROR: you need to authorize before you can restore");
 	if (user == nil || group == nil) {
@@ -131,8 +156,8 @@ void authorize_as(int user, int group) {
 	
 	authorize_as(user.intValue, group.intValue);
 	
-	[NSUserDefaults.standardUserDefaults removeObjectForKey:@"iagr_user"];
-	[NSUserDefaults.standardUserDefaults removeObjectForKey:@"iagr_group"];
+    _user = [NSNumber numberWithInt:getuid()];
+    _group = [NSNumber numberWithInt:getgid()];
 }
 
 @end
